@@ -7,6 +7,8 @@ using System.Web.Mvc;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Twilio2PagerDuty.Models;
+using Twilio.TwiML;
+using Twilio.TwiML.Mvc;
 
 namespace Twilio2PagerDuty.Controllers
 {
@@ -18,7 +20,7 @@ namespace Twilio2PagerDuty.Controllers
         protected static readonly HttpClient _httpclient = new HttpClient();
 
 
-        public async Task<ActionResult> Index(string ServiceKey, string From, string To, string Body, string SmsSid)
+        public async Task<TwiMLResult> Index(string ServiceKey, string From, string To, string Body, string SmsSid)
         {
             var msg = "From: " + From + "\r\n" + Body;
             var pdEvent = new PagerDutyEvent() {
@@ -26,6 +28,8 @@ namespace Twilio2PagerDuty.Controllers
                 event_type = "trigger",
                 description = msg.Substring(0,Math.Min(1024, msg.Length))
             };
+
+            var tResp = new TwilioResponse();
             try
             {
                 using (var response = await _httpclient.PostAsJsonAsync<PagerDutyEvent>("https://events.pagerduty.com/generic/2010-04-15/create_event.json", pdEvent))
@@ -33,19 +37,19 @@ namespace Twilio2PagerDuty.Controllers
                     
                     if (response.IsSuccessStatusCode)
                     {
-                        ViewBag.Message = "PagerDuty incident created.";
+                        tResp.Sms("PagerDuty incident created.");
                     }
                     else
                     {
-                        ViewBag.Message = "failed to create PagerDuty incident - statusCode " + response.StatusCode.ToString();
+                        tResp.Sms("failed to create PagerDuty incident - statusCode " + response.StatusCode.ToString());
                     }
                 }
             }
             catch
             {
-                ViewBag.Message = "failed to create PagerDuty incident";
+                tResp.Sms("failed to create PagerDuty incident");
             }
-            return View();
+            return new TwiMLResult(tResp);
         }
 
 
