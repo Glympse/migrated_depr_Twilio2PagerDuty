@@ -12,7 +12,7 @@ To use:
 5. Sign into Twilio and create a new number for incoming SMS messaging.
 6. Set the Twilio Request URL to be the URL of the site deployed in step 2 adding the path, "PagerDuty/" followed by your PagerDuty service key from step 3.
 
-i.e. https://alerts.mysite.com/PagerDuty/<MyPagerDutyServiceKey>
+i.e. https://alerts.mysite.com/PagerDuty/df1a15a5c3a942eb9ea14abb3a12ef4c
 
 Enjoy
 -Craig
